@@ -24,3 +24,46 @@ neutron:
     gre:
       tunnel_start: "1"
       tunnel_end: "1000"
+  networks:
+    Internal:
+      user: admin
+      tenant: admin
+      subnets:
+        InternalSubnet:
+          cidr: '192.168.10.0/24'
+          dns_nameservers:
+            - '8.8.8.8'
+    ExternalNetwork:
+      user: admin
+      tenant: admin
+      provider_physical_network: External
+      provider_network_type: flat
+      shared: true
+      admin_state_up: false
+      router_external: true
+      subnets:
+        ExternalSubnet:
+          cidr: '10.8.127.0/24'
+          allocation_pools:
+            - start: '10.8.127.10'
+              end: '10.8.127.30'
+          enable_dhcp: false
+  routers:
+    ExternalRouter:
+      user: admin
+      tenant: admin
+      interfaces:
+        - InternalSubnet
+      external_gateway: ExternalNetwork
+  security_groups:
+    Default:
+      user: admin
+      tenant: admin
+      description: 'Default security group'
+      rules:
+        - direction: ingress
+          ethertype: ipv4
+          remote_ip_prefix: '10.8.27.0/24'
+        - direction: ingress
+          remote_ip_prefix: '10.8.127.0/24'
+
